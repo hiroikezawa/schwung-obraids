@@ -95,7 +95,8 @@ Synth に **oBraids** を選びます。
 - **PITCH** はスケール上の音を選びます（スケールは Scale ページで設定）。
 - ノブ 7 は何もしません（触っても安全）。
 - **ジョグを回す**と AD（エンベロープと音程）→ Braids（ビット・レートなど）→ Scale
-  （ROOT・SCALE・STEPS）のページに移ります。音の長さは AD ページの **DECAY** です。
+  （ROOT・SCALE・STEPS）→ My Presets（プリセット）→ Module のページに移ります。
+  音の長さは AD ページの **DECAY** です。
 
 ### 3. パターンを作る（パッド）
 
