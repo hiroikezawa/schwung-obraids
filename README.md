@@ -130,7 +130,23 @@ Synth に **oBraids** を選びます。
 記録できるのは MODEL・TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・
 AD>TIMBRE・AD>COLOR です（VOLUME は記録しません）。
 
-### 5. 終わるとき
+### 5. プリセットに保存する・呼び出す
+
+ジョグを回して最後のほうのページ **My Presets** に行きます。
+
+- **Save As**: 今の状態に名前を付けて保存（キーボードが出ます）。
+- **Preset**（一番上の行）: クリックするとプリセット一覧が開き、選んだものを読み込みます。
+  今読み込んでいるプリセット名もここに表示されます（何も読み込んでいなければ `(none)`）。
+- **Save**: 読み込み中のプリセットに上書き保存。**Delete**: 読み込み中のプリセットを削除。
+
+プリセットには、すべてのノブの値に加えて、**記録したノブの動き・RANDOM で作った
+メロディ・ステップの ON/OFF** も入ります。どのスロットの oBraids からでも呼び出せます。
+最初から入っているプリセットはありません。MODELS 一覧の ON/OFF はプリセットとは別の設定です。
+
+その隣の **Module** ページでは、モジュールの入れ替えやヘルプが使えます
+（Schwung の全モジュール共通のページです）。
+
+### 6. 終わるとき
 
 **Back** で画面を閉じます。パッドは Move に戻ります。音色・記録・ステップの ON/OFF は
 セット（スロットのオートセーブ）やプリセットに保存されます。
@@ -156,6 +172,8 @@ AD>TIMBRE・AD>COLOR です（VOLUME は記録しません）。
 | AD | ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR・AD>VCA・COARSE・FINE |
 | Braids | BITS・RATE・DRIFT・FLAT・SIGN・NOTE OFF |
 | Scale | ROOT・SCALE・STEPS |
+| My Presets | プリセットの呼び出し・保存・削除（Schwung 共通） |
+| Module | モジュールの入れ替え・ヘルプ（Schwung 共通） |
 
 ノブ 5・6 は**ローパスフィルター**（CUTOFF / RESO）です。ノブ 7 は**何もしないダミー**
 （点線の枠に `-`）で、回しても触っても何も起きません。Schwung 標準グリッドは空きの
