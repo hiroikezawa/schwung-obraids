@@ -1,0 +1,381 @@
+# oBraids
+
+（モジュール ID: `obraids`）
+
+Schwung / Ableton Move 用の Sound Generator です。Mutable Instruments 公式 Braids の
+DSP コードを同梱し、**実機と同じ 96 kHz・24 サンプルブロック**で動かして
+44.1 kHz へリサンプルします。内部 AD エンベロープと AD→FM / TIMBRE / COLOR / VCA は
+実機ファームウェアの計算そのもので、設定値も**実機のメニューと同じ単位**です
+（DECAY 5 は実機の DECAY 5 と同じ意味）。
+
+**DFAM / LXRDRUM 風の自動シーケンス**を内蔵しています。Move のトランスポートに
+同期して 16 分音符ごとに発音し、下 2 段のパッドでステップごとのトリガーを ON/OFF、
+右上の REC パッドでノブの動きをモーション記録、その隣の RANDOM パッドで
+Phrase Gen と同じジェネレーターのフレーズを PITCH に書き込みます。
+PITCH（ノブ 8）は最初からスケール上の音を選ぶノブです。
+
+---
+
+## ビルド方法
+
+このリポジトリ単体でビルドできます。Schwung のプラグイン API ヘッダー
+（`plugin_api_v1.h`、MIT）は `third_party/schwung/` に同梱しています（無変更）。
+
+```bash
+scripts/build.sh arm64
+```
+
+→ `dist/obraids-module.tar.gz`（Move 用 AArch64 `dsp.so` + UI + ライセンス）
+
+必要なもの: `aarch64-linux-gnu-g++`、`python3`。ビルド時に
+`scripts/check_abi.py` が「AArch64 である」「glibc 2.34 以下」「libstdc++ 非依存」
+「公開シンボルは `move_plugin_init_v2` のみ」を検査し、満たさなければ失敗します。
+
+テスト一式（ネイティブ ASan/UBSan のエンジンテスト、実 `dsp.so` の dlopen スモーク、
+UI テスト、最後に arm64 ビルド）:
+
+```bash
+scripts/test.sh
+```
+
+UI テストには Node.js と、Schwung 本体のチェックアウト（ページエンジンと描画ハーネスを
+使うため）が必要です。このリポジトリと同じ階層の `../schwung`、または
+`SCHWUNG_ROOT=/path/to/schwung` を使います。見つからなければ UI テストだけ飛ばします
+（WSL では Windows 側の `node.exe` でも可）。
+
+## Move へのインストール
+
+Schwung Manager（`http://<Move の IP>:7700`）経由でアップロードします:
+
+```bash
+scripts/install.py http://move.local:7700
+```
+
+（`--check` を付けると接続確認のみ）。インストール後、チェーンのスロットで
+Synth に **oBraids** を選びます。
+
+**更新したときは Move を再起動してください。** 読み込み済みの古い `dsp.so` が
+プロセスに残るため、スロットを選び直すだけでは新しい版になりません。
+
+## 使い方（はじめての操作）
+
+基本の流れは「スロットに入れる → 再生する → ノブで音を作る → パッドでパターンを作る
+→ REC でノブの動きを記録する」です。
+
+### 1. 音を出す
+
+1. Schwung の画面（Shift+Vol+Track、またはトラックボタン長押し）でスロットを開き、
+   Synth に **oBraids** を選びます。
+2. スロットの Synth（oBraids）を開くと、oBraids の画面になります。
+3. Move の **Play** を押します。oBraids は**トランスポートに合わせて 16 分音符ごとに
+   自動で鳴ります**（クリップや MIDI ノートは不要）。停止中は鳴りません。
+   Move のトラックからの MIDI ノートでも、これまでどおり鳴らせます。
+
+### 2. 音色を作る（メインページ）
+
+| ノブ | | |
+|---|---|---|
+| 1 VOLUME | 2 MODEL（47 種の音色） | 3 TIMBRE | 4 COLOR |
+| 5 CUTOFF | 6 RESO | 7（ダミー） | 8 PITCH |
+
+- **MODEL** で音色の種類、**TIMBRE / COLOR** で音色の変化を選びます（Braids の 2 つのポット）。
+- **CUTOFF / RESO** はローパスフィルター。CUTOFF を下げるとこもった音に、RESO で癖が付きます。
+- **PITCH** はスケール上の音を選びます（スケールは Scale ページで設定）。
+- ノブ 7 は何もしません（触っても安全）。
+- **ジョグを回す**と AD（エンベロープと音程）→ Braids（ビット・レートなど）→ Scale
+  （ROOT・SCALE・STEPS）のページに移ります。音の長さは AD ページの **DECAY** です。
+
+### 3. パターンを作る（パッド）
+
+画面を開いている間、パッドは oBraids 専用になります（Move 純正には届きません）。
+
+```
+                         MODELS  RANDOM  REC   ← 一番上の段の右 3 つ
+  9  10  11  12  13  14  15  16                ← 下から 2 段目
+  1   2   3   4   5   6   7   8                ← 一番下の段
+```
+
+- **下 2 段**を押すと、そのステップの発音を ON（明るい）/ OFF（暗い）で切り替えます。
+  白く光っているのが今鳴っているステップ。8 ステップのときは下から 2 段目は消灯です
+  （16 ステップは Scale ページの STEPS で）。
+- **RANDOM** を押すと、新しいメロディ（Phrase Gen と同じ生成）が PITCH に書き込まれます。
+  気に入るまで何度でも押せます。音域はノブ 8 の PITCH が中心になります。
+- **MODELS** を押すと、MODEL ノブで選べる音色の ON/OFF 一覧が開きます（下記）。
+
+### 4. ノブの動きを記録する（REC）
+
+1. **REC**（一番右上のパッド）を押して ON にします（真っ赤に光る。OFF は薄い赤）。
+2. Move を再生した状態で、記録したいノブに**触れたまま回します**。
+   触れている間だけ、ループの各ステップにその値が記録されます。指を離すと記録終了。
+3. 記録されたノブは、以後ループのたびにその動きを再生します。
+   ノブの値自体は書き換わらず、記録を消すと元の値に戻ります。
+4. 消すとき: **Shift を押しながらノブに触れる**とそのノブの記録を消去。
+   **Shift + ノブ 1（VOLUME）に触れる**と全部消去。
+5. 記録が終わったら REC をもう一度押して OFF にすると、うっかり触っても記録されません。
+
+記録できるのは MODEL・TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・
+AD>TIMBRE・AD>COLOR です（VOLUME は記録しません）。
+
+### 5. 終わるとき
+
+**Back** で画面を閉じます。パッドは Move に戻ります。音色・記録・ステップの ON/OFF は
+セット（スロットのオートセーブ）やプリセットに保存されます。
+
+## 操作方法（詳細）
+
+v0.3.0 以降、画面・ノブ・パッドは **BAKIBAKI / LXRDRUM と同じ UI** です（Schwung 標準の
+ノブグリッドを oBraids 自身が動かし、ノブのタッチとパッドを追加しています）。
+
+| 操作 | 動作 |
+|---|---|
+| ノブ 1–8 | 現在ページのパラメータ（下のページ表） |
+| ノブにタッチ（REC ON・再生中） | そのノブの動きを**モーション記録**（下記） |
+| Shift + ノブにタッチ | そのノブの記録を消す。VOLUME（ノブ 1）なら**全部**消す |
+| ジョグ回転 / クリック | ページ切替・項目選択（Schwung 標準グリッドと同じ） |
+| Back | 画面を閉じる（パッドは Move に戻る） |
+
+ページ:
+
+| ページ | ノブ 1–8 |
+|---|---|
+| メイン | VOLUME・MODEL・TIMBRE・COLOR・CUTOFF・RESO・（ダミー）・PITCH |
+| AD | ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR・AD>VCA・COARSE・FINE |
+| Braids | BITS・RATE・DRIFT・FLAT・SIGN・NOTE OFF |
+| Scale | ROOT・SCALE・STEPS |
+
+ノブ 5・6 は**ローパスフィルター**（CUTOFF / RESO）です。ノブ 7 は**何もしないダミー**
+（点線の枠に `-`）で、回しても触っても何も起きません。Schwung 標準グリッドは空きの
+ノブ枠を作れない（詰めて並べる）ので、PITCH をノブ 8 に置くための埋め草です。
+DECAY / AD>FM / AD>TIMBRE は、うっかり触らないよう AD ページに移しました（v0.4.0）。
+
+ヘッダーには現在のモデル名、ループの位置、REC ON 中は `ARM`、記録中は `REC` が出ます。
+記録のあるノブは Schwung の「モジュレーション中」の表示（再生中の値が動く）になります。
+
+## パッド
+
+**この画面を開いている間、パッドは oBraids が占有します**（`host_pad_block`）。
+Move 純正の音源・シーケンサーにはパッド操作が届きません。画面を閉じるとパッドは
+Move に戻り、色も元に戻ります（Schwung の仕様で、占有できるのは画面表示中だけ）。
+配置と色は MANIAC / LXRDRUM / BAKIBAKI と同じです。
+
+```
+上段  .   .   .   .   .   MODELS  RANDOM  REC      ← 一番右上が REC
+      .   .   .   .   .   .       .       .
+      9  10  11  12  13  14      15      16        ← トリガー 9–16
+下段  1   2   3   4   5   6       7       8        ← トリガー 1–8
+```
+
+| パッド | 動作 |
+|---|---|
+| **REC**（右上） | モーション記録の ON/OFF。**ON = 真っ赤、OFF = 薄い赤** |
+| **RANDOM**（その左隣） | Phrase Gen と同じジェネレーターで新しいフレーズを作り、PITCH の各ステップに書き込む |
+| MODELS（さらに左） | MODELS 一覧（使う音色の設定）を開く／閉じる |
+| 下 2 段（16 個） | 各ステップのトリガー ON/OFF。ON = 明るい、OFF = 暗い、再生中のステップ = 白。8 ステップ時は上の段（9–16）は消灯 |
+
+- 再生は **Move のトランスポートに同期して 16 分音符ごとに自動で発音**します
+  （Play で開始、停止中は鳴りません。ステップの頭は小節頭にそろいます）。
+  トリガー OFF のステップでは前の音を止めて休符になります。
+- ループの長さは Scale ページの **STEPS**（8 / 16、既定 8）。
+- Move のトラックから来る MIDI ノート（クリップや、画面を閉じているときのパッド）も
+  これまでどおり oBraids を鳴らします。
+
+### モーション記録
+
+- REC を ON にして Move を再生し、**ノブに触れている間**、そのノブの動きが
+  ループに記録されます（1/16 ごとに 8 点、PISTON / BAKIBAKI と同じ方式）。指を離すと終了。
+- 対象: MODEL・TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR。
+  VOLUME は記録しません。
+- 再生はノブの値を書き換えません（記録が優先されるだけ）。Shift + タッチで消すと
+  ノブの値に戻ります。
+
+### RANDOM と PITCH（ノブ 8）
+
+- **PITCH は最初からスケール上の音**です。ノブ 8 は Scale ページの ROOT + SCALE の
+  音だけを C1〜C6（5 オクターブ）の範囲で選びます（後からクオンタイズするのではなく、
+  ノブ自体がスケールの音階で動きます）。既定は C フリジアンの C3。
+- ROOT / SCALE を変えると、PITCH と記録済みの PITCH は新しいスケールの最寄りの音に移ります。
+- SCALE: Phrygian（既定）・Minor・Dorian・Major・Mixolyd・Lydian・Locrian・HarmMin・
+  PhrygDom・MinPent・In・Chromatic。
+- RANDOM は Phrase Gen（変化量 50%、元ネタランダム）で STEPS 分のフレーズを作り、
+  ROOT に移調し、ノブ 8 の音の −7〜+17 半音の範囲に畳んで、スケールに合わせて
+  PITCH の記録として書き込みます。押すたびに新しいフレーズになります。
+
+## 使う音色を選ぶ（MODELS 一覧）
+
+47 モデルのうち、MODEL ノブで選べるものを決められます。
+
+1. **MODELS パッド**（RANDOM の左隣）を押す → 一覧が開きます（カーソルは今鳴っているモデル、右端の `<` が現在のモデル）。
+2. ジョグを回してカーソル移動（端で止まります）、ジョグクリックで **ON / OFF**（■ = ON、□ = OFF）。
+3. 先頭の **ALL ON** ですべて ON、**ALL OFF** で今鳴っているモデル以外をすべて OFF。
+4. **Back** か MODELS パッドで一覧を閉じます。
+
+- 変更はすぐ保存されます（`/data/UserData/schwung/obraids/settings.json`）。
+  全スロットの oBraids 共通で、再インストールでも消えません。プリセットには含まれません。
+- MODEL ノブは ON のモデルだけを順に選び、両端で止まります。
+- 最低 1 つは ON のまま残ります（「ONE MUST STAY ON」）。
+
+## パラメータ一覧
+
+| ページ | ノブ | 名前 | 範囲 | 実機との対応 |
+|---|---|---|---|---|
+| メイン | 1 | VOLUME | 0–100（既定 50） | 出力レベル |
+| メイン | 2 | MODEL（音色） | 47 モデル | WAVE メニュー（CSAW … QPSK、下表） |
+| メイン | 3 | TIMBRE | 0–100 | TIMBRE ポット（0–32767） |
+| メイン | 4 | COLOR | 0–100 | COLOR ポット（0–32767） |
+| メイン | 5 | CUTOFF | 20 Hz–20 kHz（既定 20 kHz = 全開） | ローパスフィルター（実機にはない） |
+| メイン | 6 | RESO | 0–100（既定 0） | フィルターのレゾナンス（Q 0.7〜10） |
+| メイン | 7 | （ダミー） | – | 何もしない |
+| メイン | 8 | PITCH | スケールの音、C1–C6（既定 C3） | 発音する音程 |
+| AD | 1 | ATTACK | 0–15 | `\ATT` |
+| AD | 2 | DECAY | 0–15（既定 5） | `\DEC` |
+| AD | 3 | AD>FM | 0–15 | `\FM ` |
+| AD | 4 | AD>TIMBRE | 0–15 | `\TIM` |
+| AD | 5 | AD>COLOR | 0–15 | `\COL` |
+| AD | 6 | AD>VCA | OFF / ON | `\VCA` |
+| AD | 7 | COARSE | −24…+24 半音 | COARSE ポットの代わり（MIDI ノートにも効く） |
+| AD | 8 | FINE | −100…+100 cent | FINE ポット |
+| Braids | 1 | BITS | 2BIT…16B | `BITS` |
+| Braids | 2 | RATE | 4K…96K | `RATE` |
+| Braids | 3 | DRIFT | OFF, 1–3, FULL | `DRFT` |
+| Braids | 4 | FLAT | OFF / ON | `FLAT` |
+| Braids | 5 | SIGN | OFF, 1–3, FULL | `SIGN` |
+| Braids | 6 | NOTE OFF | AUTO / DRONE / GATE | ノートオフの扱い（下記） |
+| Scale | 1 | ROOT | C…B | PITCH の音階の主音 |
+| Scale | 2 | SCALE | 12 種 | PITCH の音階 |
+| Scale | 3 | STEPS | 8 / 16（既定 8） | ループの長さ |
+
+ローパスフィルターは Braids の音の後段に入る 12 dB/oct のフィルターです（実機の Braids には
+フィルターがないので oBraids 独自）。CUTOFF 全開（既定）では可聴域でほぼ素通しなので、
+触らなければ Braids そのままの音です。CUTOFF と RESO もモーション記録できます。
+
+AD エンベロープの実時間（実機ファームウェアのテーブル
+`lut_env_portamento_increments` を 4 kHz 制御レートで回した値。実機と同一）:
+
+| 値 | 0 | 1 | 2 | 3 | 4 | **5** | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| セグメント長 (ms) | 0.8 | 2.6 | 7.1 | 16.7 | 35.3 | **68.4** | 124 | 212 | 346 | 543 | 825 | 1219 | 1756 | 2475 | 3422 | 4648 |
+
+**AD>FM = 10** は、エンベロープのピークで `65535 × 10 >> 7 = 5119`（1/128 半音単位）、
+つまり **+40 半音**。実機の `pitch += ad_value * setting >> 7` そのものです。
+AD>TIMBRE / AD>COLOR も実機どおり `ad_value * setting >> 5` をポット値に加算します。
+
+モデル一覧（実機表示の特殊文字は ASCII に置換）:
+CSAW, MORPH, SAWSQ, FOLD, BUZZ, SUBSQ, SUBSW, SYNSQ, SYNSW, SAWx3, SQRx3, TRIx3,
+SINx3, RING, SWARM, COMB, TOY, ZLPF, ZPKF, ZBPF, ZHPF, VOSM, VOWL, VFOF, HARM, FM,
+FBFM, WTFM, PLUK, BOWD, BLOW, FLUT, **BELL**, DRUM, KICK, CYMB, SNAR, WTBL, WMAP,
+WLIN, WTx4, NOIS, TWNQ, CLKN, CLOU, PRTC, QPSK
+
+### NOTE OFF
+
+Braids 実機にはゲートがないため、ノートオフの扱いを選べるようにしています。
+
+| 値 | 動作 |
+|---|---|
+| AUTO（既定） | AD>VCA = ON のときは実機どおり AD エンベロープが音量そのもの。AD>VCA = OFF のときは鍵盤（自動発音では次の 1/16 まで）に合わせてゲート |
+| DRONE | 実機どおり。ノートオフを無視して鳴り続ける（CC 120 で止まる） |
+| GATE | AD>VCA に関係なく常にゲート |
+
+## MIDI
+
+MIDI ノートは Braids の TRIG 入力 + V/OCT に相当します。
+
+| メッセージ | 動作 |
+|---|---|
+| ノートオン | `osc.Strike()` と AD エンベロープのトリガー |
+| ノートオフ | NOTE OFF の設定に従う |
+| ベロシティ | 使いません（実機に入力がないため） |
+| ピッチベンド | ±2 半音 |
+| CC 123 / CC 120 | All Notes Off / All Sound Off |
+| MIDI クロック | ホストがトランスポート位置を持たない場合だけ、自動発音の同期に使う |
+
+## 状態保存
+
+プリセット、オートセーブ、Shift+Copy のスナップショットはすべて `state` を通り、
+全設定・モーション記録・トリガーの ON/OFF を保存します:
+
+```json
+{"v":2,"level":0.5000,"model":32,...,"decay":5,...,"steps":0,"m":"pitch:<data>;...","g":65535}
+```
+
+整数の設定は整数のまま保存します。v0.2 の state（`"v":1`）も読めます（旧 `pitch` は
+COARSE、`length` は STEPS として読み込み、フレーズは引き継ぎません）。
+
+## サンプルレートについて
+
+Braids は「96 kHz の発振器」というだけではなく、`resources.cc` のテーブルすべて
+（発振器の位相増分と遅延、SVF・レゾネータ係数、弓/息の励振長）が 96 kHz 用に
+生成されており、AD エンベロープは 24 サンプルごと（= 4 kHz）に 1 回進みます。
+44.1 kHz 用に増分だけ直すと音程は合っても他が全部ずれるため、**実機と同じ
+96 kHz・24 サンプルブロックでそのまま動かし**、その出力を 147/320 の多相 FIR
+（64 タップ、19 kHz まで平坦、25.5 kHz 以上 70 dB 以上減衰）で 44.1 kHz にします。
+音程・エンベロープ時間・各モデルの内部タイミングは構造上、実機と同じです
+（テストで音程誤差 0.2% 以内、エンベロープ時間を実機コードと比較）。
+
+## レベルとヘッドルーム
+
+Braids は実機同様に出力が大きく（LEVEL 100 で CSAW が約 −7 dBFS RMS、一部のモデルは
+ピークが 0 dBFS を超える）、既定の LEVEL 50 でもヘッドルームが残るようにしています。
+最終段に −0.9 dBFS から効くソフトリミッターがあり、既定レベルではそこに届きません。
+
+## 既知の制約
+
+- **実機（Move）での動作確認はまだです。** ノブ・ノブタッチ・ジョグ・パッド占有・
+  パッド LED の経路は Schwung のソースから確認したもので、ハードウェアで試していません。
+- パッドの占有は画面を開いている間だけです（Schwung の仕様）。
+- 標準グリッドは空きのノブ枠を作れないため、メインページのノブ 7 は空きではなく
+  何もしないダミーです。
+- ループの長さは 8 / 16 ステップの手動設定です。Move のクリップ長への自動追従は、
+  Schwung 本体がクリップ長を音源に渡す仕組みを持っていないため行っていません。
+- Braids の CV 入力に依存する機能は移植していません: META モード、FM CV 入力、
+  オートトリガー、クオンタイザ（MIDI ノートは元々半音単位）、トリガーディレイ、
+  キャリブレーション、OCTV / RANG（PITCH で代用）、隠しモデル（`????`）。
+- SIGN（シグネチャ波形整形）は実機では個体の ID で決まる形です。ここでは
+  固定シードなので、どの Move でも同じ音になります。
+- シンク（位相リセット）はブロック先頭のサンプルに入ります（実機はサンプル単位。
+  差は最大 0.25 ms）。
+- 上流 Braids の WLIN モデルにある配列外読み出しを 1 箇所修正しています
+  （`patches/0001`、TIMBRE 最上部 1/64 の挙動のみ）。
+- モノフォニックです。
+- CPU 負荷の実測は x86（Ryzen 5 5600）のみ: 音源 6–9 µs、フレーズ再生込みで約 6 µs
+  （128 サンプル = 2.9 ms ブロックあたり）。インスタンス作成（元ネタ MIDI の解析）は
+  最大 40 µs。Move の ARM では数倍になる見込みで、実機で要確認です。
+
+## ライセンス
+
+- このモジュール自身のコード: **MIT**（`LICENSE`）
+- `src/braids/mi/`: Mutable Instruments Braids / stmlib、**MIT**、
+  Copyright 2012 Emilie Gillet。上流コミットと差分は `THIRD_PARTY_LICENSES.md`、
+  `patches/`、`scripts/fetch_braids.sh --verify` を参照。
+- `src/phrase/` と `patterns/`: 同じ作者の Phrase Gen（Schwung 用 MIDI FX）から
+  取り込んだコードと元ネタ MIDI（RANDOM パッドのフレーズ生成に使用）。
+- `third_party/schwung/`: Schwung の `plugin_api_v1.h`、**MIT**、
+  Copyright 2025-2026 Charles Vestal（`third_party/schwung/LICENSE`）。
+- `dsp.so` がリンクするのは libc / libm のみで、コピーレフトのコードは含みません。
+  Schwung（MIT）とも衝突しません。
+- 名称: 上流は派生物に「Mutable Instruments」の名を使わないよう求めており、
+  元のモジュール名を使わないことを推奨しています。このモジュールの名前は
+  oBraids です（ユーザー指定）。公開・配布する場合は名称の変更を検討してください
+  （`module.json` の `name`）。
+
+## ファイル構成
+
+```
+schwung-obraids/
+  module.json            chain_params（DSP の表と build 時に照合）
+  ui_chain.js            Schwung の関数を ui_core.mjs に接続するだけ
+  ui_core.mjs            Schwung のページエンジン駆動・ノブタッチ・パッド・MODELS 一覧
+  ui_params.mjs          module.json から生成
+  src/dsp_plugin.cpp     plugin API v2 アダプタ（静的プール、RT 安全）
+  src/wrapper/           MIDI・パラメータ・状態保存、パラメータ表
+  src/braids/            BraidsEngine（braids.cc RenderBlock の移植）、リサンプラ
+  src/braids/mi/         Mutable Instruments 公式コード（同梱、MIT）
+  src/phrase/            Phrase Gen のエンジン（解析・生成・シーケンサー・スケール）
+  src/wrapper/motion.*   1/16 クロックとモーション記録
+  src/wrapper/scale.*    PITCH のスケール（12 種、C1–C6）
+  src/wrapper/random_phrase.*  RANDOM（Phrase Gen で PITCH の記録を作る）
+  patterns/              フレーズの元ネタ MIDI（ビルド時に埋め込み）
+  patches/               上流 Braids への修正
+  scripts/               build / test / install / fetch_braids / 生成スクリプト
+  tests/                 エンジン、dlopen スモーク、UI
+  third_party/schwung/   Schwung の plugin API ヘッダー（MIT、無変更）
+```

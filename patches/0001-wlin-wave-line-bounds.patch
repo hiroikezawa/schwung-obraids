@@ -1,0 +1,14 @@
+--- a/braids/digital_oscillator.cc	2026-09-24 18:40:28.214634706 +0900
++++ b/braids/digital_oscillator.cc	2026-09-24 19:04:08.547967041 +0900
+@@ -1634,7 +1634,10 @@
+   uint16_t scan = smoothed_parameter_;
+   const uint8_t* wave_0 = wt_waves + wave_line[previous_parameter_[0] >> 9] * 129;
+   const uint8_t* wave_1 = wt_waves + wave_line[scan >> 10] * 129;
+-  const uint8_t* wave_2 = wt_waves + wave_line[(scan >> 10) + 1] * 129;
++  // oBraids patch (patches/0001): upstream indexes wave_line[64], one
++  // past the end, when scan >= 64512 (TIMBRE near max). Clamp to the last
++  // entry: the top 1/64 of the scan then holds the last wave.
++  const uint8_t* wave_2 = wt_waves + wave_line[(scan >> 10) + 1 > 63 ? 63 : (scan >> 10) + 1] * 129;
+ 
+   uint16_t smooth_xfade = scan << 6;
+   uint16_t rough_xfade = 0;

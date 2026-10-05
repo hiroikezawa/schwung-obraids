@@ -1,0 +1,306 @@
+/* Generated from module.json by scripts/metadata.py. Do not edit. */
+export const PARAMS = [
+ {
+  "key": "level",
+  "name": "Volume",
+  "short_name": "VOLUME",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0.5,
+  "unit": "%"
+ },
+ {
+  "key": "model",
+  "name": "Model",
+  "short_name": "MODEL",
+  "type": "int",
+  "min": 0,
+  "max": 46,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "timbre",
+  "name": "Timbre",
+  "short_name": "TIMBRE",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0.5,
+  "unit": "%"
+ },
+ {
+  "key": "color",
+  "name": "Color",
+  "short_name": "COLOR",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0.5,
+  "unit": "%"
+ },
+ {
+  "key": "cutoff",
+  "name": "Cutoff",
+  "short_name": "CUTOFF",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 1
+ },
+ {
+  "key": "reso",
+  "name": "Resonance",
+  "short_name": "RESO",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0,
+  "unit": "%"
+ },
+ {
+  "key": "spare",
+  "name": "-",
+  "short_name": "-",
+  "type": "enum",
+  "options": [
+   "-"
+  ],
+  "default": "-",
+  "access": "read"
+ },
+ {
+  "key": "pitch",
+  "name": "Pitch",
+  "short_name": "PITCH",
+  "type": "int",
+  "min": 0,
+  "max": 35,
+  "step": 1,
+  "default": 14
+ },
+ {
+  "key": "attack",
+  "name": "AD Attack",
+  "short_name": "ATTACK",
+  "type": "int",
+  "min": 0,
+  "max": 15,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "decay",
+  "name": "AD Decay",
+  "short_name": "DECAY",
+  "type": "int",
+  "min": 0,
+  "max": 15,
+  "step": 1,
+  "default": 5
+ },
+ {
+  "key": "ad_fm",
+  "name": "AD>FM",
+  "short_name": "AD>FM",
+  "type": "int",
+  "min": 0,
+  "max": 15,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "ad_timbre",
+  "name": "AD>Timbre",
+  "short_name": "AD>TIM",
+  "type": "int",
+  "min": 0,
+  "max": 15,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "ad_color",
+  "name": "AD>Color",
+  "short_name": "AD>COL",
+  "type": "int",
+  "min": 0,
+  "max": 15,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "ad_vca",
+  "name": "AD>VCA",
+  "short_name": "AD>VCA",
+  "type": "enum",
+  "options": [
+   "OFF",
+   "ON"
+  ],
+  "default": "OFF"
+ },
+ {
+  "key": "coarse",
+  "name": "Coarse",
+  "short_name": "COARSE",
+  "type": "int",
+  "min": -24,
+  "max": 24,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "fine",
+  "name": "Fine",
+  "short_name": "FINE",
+  "type": "int",
+  "min": -100,
+  "max": 100,
+  "step": 1,
+  "default": 0
+ },
+ {
+  "key": "bits",
+  "name": "Bits",
+  "short_name": "BITS",
+  "type": "enum",
+  "options": [
+   "2BIT",
+   "3BIT",
+   "4BIT",
+   "6BIT",
+   "8BIT",
+   "12B",
+   "16B"
+  ],
+  "default": "16B"
+ },
+ {
+  "key": "rate",
+  "name": "Rate",
+  "short_name": "RATE",
+  "type": "enum",
+  "options": [
+   "4K",
+   "8K",
+   "16K",
+   "24K",
+   "32K",
+   "48K",
+   "96K"
+  ],
+  "default": "96K"
+ },
+ {
+  "key": "drift",
+  "name": "VCO Drift",
+  "short_name": "DRIFT",
+  "type": "enum",
+  "options": [
+   "OFF",
+   "1",
+   "2",
+   "3",
+   "FULL"
+  ],
+  "default": "OFF"
+ },
+ {
+  "key": "flat",
+  "name": "VCO Flatten",
+  "short_name": "FLAT",
+  "type": "enum",
+  "options": [
+   "OFF",
+   "ON"
+  ],
+  "default": "OFF"
+ },
+ {
+  "key": "sign",
+  "name": "Signature",
+  "short_name": "SIGN",
+  "type": "enum",
+  "options": [
+   "OFF",
+   "1",
+   "2",
+   "3",
+   "FULL"
+  ],
+  "default": "OFF"
+ },
+ {
+  "key": "noteoff",
+  "name": "Note Off",
+  "short_name": "N.OFF",
+  "type": "enum",
+  "options": [
+   "AUTO",
+   "DRONE",
+   "GATE"
+  ],
+  "default": "AUTO"
+ },
+ {
+  "key": "root",
+  "name": "Root",
+  "short_name": "ROOT",
+  "type": "enum",
+  "options": [
+   "C",
+   "Db",
+   "D",
+   "Eb",
+   "E",
+   "F",
+   "Gb",
+   "G",
+   "Ab",
+   "A",
+   "Bb",
+   "B"
+  ],
+  "default": "C"
+ },
+ {
+  "key": "scale",
+  "name": "Scale",
+  "short_name": "SCALE",
+  "type": "enum",
+  "options": [
+   "Phrygian",
+   "Minor",
+   "Dorian",
+   "Major",
+   "Mixolyd",
+   "Lydian",
+   "Locrian",
+   "HarmMin",
+   "PhrygDom",
+   "MinPent",
+   "In",
+   "Chromatic"
+  ],
+  "default": "Phrygian"
+ },
+ {
+  "key": "steps",
+  "name": "Steps",
+  "short_name": "STEPS",
+  "type": "enum",
+  "options": [
+   "8",
+   "16"
+  ],
+  "default": "8"
+ }
+];
+export const MODEL_NAMES = ["CSAW", "MORPH", "SAWSQ", "FOLD", "BUZZ", "SUBSQ", "SUBSW", "SYNSQ", "SYNSW", "SAWx3", "SQRx3", "TRIx3", "SINx3", "RING", "SWARM", "COMB", "TOY", "ZLPF", "ZPKF", "ZBPF", "ZHPF", "VOSM", "VOWL", "VFOF", "HARM", "FM", "FBFM", "WTFM", "PLUK", "BOWD", "BLOW", "FLUT", "BELL", "DRUM", "KICK", "CYMB", "SNAR", "WTBL", "WMAP", "WLIN", "WTx4", "NOIS", "TWNQ", "CLKN", "CLOU", "PRTC", "QPSK"];
