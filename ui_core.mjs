@@ -187,7 +187,13 @@ export function createUi(deps) {
             try {
                 const list = JSON.parse(raw);
                 const m = list.find((p) => p.key === "model");
-                if (m) { m.max = Math.max(0, st.vis.length - 1); m.default = 0; }
+                /* Served as an enum named by the 47 models (for Schwung's own
+                 * screens); here it is an int over the models switched ON,
+                 * named through formatValue. */
+                if (m) {
+                    delete m.options;
+                    Object.assign(m, { type: "int", min: 0, max: Math.max(0, st.vis.length - 1), step: 1, default: 0 });
+                }
                 return JSON.stringify(list);
             } catch (e) { return raw; }
         }

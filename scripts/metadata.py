@@ -55,7 +55,10 @@ shapes = re.findall(r"MACRO_OSC_SHAPE_(\w+)", enum_body)
 menu = shapes[:shapes.index("DIGITAL_MODULATION") + 1]
 assert len(models) == len(menu) == 47, ("model names vs Braids WAVE menu", len(models), len(menu))
 model = next(p for p in params if p["key"] == "model")
-assert model["type"] == "int" and model["max"] == len(models) - 1
+# An enum NAMED by model_names, so a screen that is not ours (Schwung's own
+# knob card in the chain editor) shows "BELL" rather than "32". Our UI turns
+# it back into an int over the models switched on (ui_core.mjs ioGet).
+assert model["type"] == "enum" and model["options"] == models
 
 # Split around PITCH's max: head + "%d" + tail.
 text = json.dumps(params, separators=(",", ":"))

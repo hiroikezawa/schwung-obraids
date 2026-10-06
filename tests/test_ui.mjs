@@ -113,7 +113,8 @@ check(ui.state.names && ui.state.names.length === 36 && ui.state.names[14] === "
 
 /* ---- MODEL: knob 2 steps over the models switched on ------------------------ */
 check(ui.state.vis.length === MODEL_COUNT, "all 47 models offered by default");
-ui.onMidi([0xb0, 72, 1]);                              /* knob 2 */
+/* knob 2: a few detents (newer page engines step a stepped knob every few) */
+for (let i = 0; i < 6; i++) { ui.onMidi([0xb0, 72, 1]); ticks(2); }
 ticks(10);
 check(writes.some(([k, v]) => k === "model" && v === "1"), "MODEL +1 writes the real index 1: " + writes.filter(([k]) => k === "model"));
 
