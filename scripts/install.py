@@ -49,7 +49,8 @@ def install(base, package, check=False):
     with opener.open(request, timeout=60) as response:
         response.read()
         flash = urllib.parse.parse_qs(urllib.parse.urlparse(response.url).query).get("flash", [""])[0]
-    if flash != "Installed " + ID + " from tarball":
+    # Newer Managers append " - restart Move to run the new version ...".
+    if not flash.startswith("Installed " + ID + " from tarball"):
         raise RuntimeError("Manager did not confirm installation: " + flash)
     print(flash)
 
