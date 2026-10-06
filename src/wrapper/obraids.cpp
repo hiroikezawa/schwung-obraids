@@ -403,10 +403,20 @@ bool OBraids::ReadState(const char *text) {
       char key[24];
       memcpy(key, q, colon - q);
       key[colon - q] = 0;
-      const int k = Motion::LaneOf(FindParam(key));
-      if (k < 0 || (seen & (1u << k)) || colon + 1 + 2 * Motion::kPoints > root_end) { have_m = false; break; }
-      seen |= 1u << k;
+      const int id = FindParam(key);
+      const int k = Motion::LaneOf(id);
+      if (id < 0 || colon + 1 + 2 * Motion::kPoints > root_end) { have_m = false; break; }
+      if (k >= 0 && (seen & (1u << k))) { have_m = false; break; }
       q = colon + 1;
+      if (k < 0) {
+        // A parameter no longer recorded (MODEL, up to 0.4.2): its lane is
+        // dropped, and the others are kept.
+        q += 2 * Motion::kPoints;
+        if (*q == ';') ++q;
+        else if (*q != '"') { have_m = false; break; }
+        continue;
+      }
+      seen |= 1u << k;
       for (int i = 0; i < Motion::kPoints; ++i) {
         const int hi = B64Val(q[0]), lo = hi < 0 ? -1 : B64Val(q[1]);
         if (hi < 0 || lo < 0) { have_m = false; break; }

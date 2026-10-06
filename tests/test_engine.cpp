@@ -407,6 +407,8 @@ static void TestHitsLandOnTheSixteenth() {
 
 static void TestTouchMotion() {
   Fresh(g_synth);
+  const unsigned kT = 1u << Motion::LaneOf(P_TIMBRE), kC = 1u << Motion::LaneOf(P_COLOR);
+  CHECK(Motion::LaneOf(P_MODEL) < 0, "MODEL must never be recorded");
   double beat = 0.0;
   RenderPlaying(g_synth, 0.1f, &beat);
   // REC off: a touch records nothing.
@@ -420,10 +422,10 @@ static void TestTouchMotion() {
   for (int i = 0; i < 9; ++i) {
     g_synth.Touch(P_TIMBRE, true);
     RenderPlaying(g_synth, 0.13f, &beat);
-    CHECK(i == 0 || (g_synth.motion_recording() & 2u), "not recording under the finger");
+    CHECK(i == 0 || (g_synth.motion_recording() & kT), "not recording under the finger");
   }
   g_synth.Touch(P_TIMBRE, false);
-  CHECK(g_synth.motion_mask() == 2u, "timbre lane %x", g_synth.motion_mask());
+  CHECK(g_synth.motion_mask() == kT, "timbre lane %x", g_synth.motion_mask());
   // Knob elsewhere: playback overrides it, and never writes it.
   Set(g_synth, P_TIMBRE, 0.2f);
   RenderPlaying(g_synth, 0.2f, &beat);
@@ -436,12 +438,12 @@ static void TestTouchMotion() {
   beat = 0.0;
   g_synth.Touch(P_COLOR, true);
   RenderPlaying(g_synth, 0.7f, &beat);
-  CHECK(!(g_synth.motion_recording() & 4u), "a touch outlived its heartbeat");
+  CHECK(!(g_synth.motion_recording() & kC), "a touch outlived its heartbeat");
   // VOLUME is never a lane; clear one lane, then all.
   g_synth.Touch(P_LEVEL, true);
-  CHECK(!(g_synth.motion_mask() & ~6u), "VOLUME recorded");
+  CHECK(!(g_synth.motion_mask() & ~(kT | kC)), "VOLUME recorded");
   g_synth.ClearMotion(P_TIMBRE);
-  CHECK(!(g_synth.motion_mask() & 2u), "clear timbre");
+  CHECK(!(g_synth.motion_mask() & kT), "clear timbre");
   g_synth.ClearMotion(-1);
   CHECK(g_synth.motion_mask() == 0, "clear all");
 }
@@ -450,7 +452,7 @@ static void TestRandomAndScale() {
   Fresh(g_synth);
   for (int n = 0; n < 50; ++n) {
     g_synth.Randomize();
-    CHECK(g_synth.motion_mask() & (1u << 6), "RANDOM left the PITCH lane empty");
+    CHECK(g_synth.motion_mask() & (1u << Motion::LaneOf(P_PITCH)), "RANDOM left the PITCH lane empty");
     double beat = 0.0;
     std::vector<float> x;
     for (int st = 0; st < 8; ++st) {

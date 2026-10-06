@@ -6,12 +6,12 @@
 namespace obraids {
 
 const int Motion::kParam[kLanes] = {
-    P_MODEL, P_TIMBRE, P_COLOR, P_DECAY, P_AD_FM, P_AD_TIMBRE, P_PITCH, P_ATTACK, P_AD_COLOR,
+    P_TIMBRE, P_COLOR, P_DECAY, P_AD_FM, P_AD_TIMBRE, P_PITCH, P_ATTACK, P_AD_COLOR,
     P_CUTOFF, P_RESO,
 };
 // Interpolated between points; the rest hold a point's value.
 static const bool kContinuous[Motion::kLanes] = {
-    false, true, true, false, false, false, false, false, false,
+    true, true, false, false, false, false, false, false,
     true, true,
 };
 

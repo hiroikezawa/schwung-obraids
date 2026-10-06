@@ -40,7 +40,7 @@ struct Clock {
 // ---- touch automation --------------------------------------------------------
 class Motion {
  public:
-  static const int kLanes = 11;
+  static const int kLanes = 10;
   static const int kMaxSteps = 16;
   static const int kSub = 8;                       // points per 1/16
   static const int kPoints = kMaxSteps * kSub;

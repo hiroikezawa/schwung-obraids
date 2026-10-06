@@ -134,8 +134,8 @@ Synth に **oBraids** を選びます。
    **Shift + ノブ 1（VOLUME）に触れる**と全部消去。
 5. 記録が終わったら REC をもう一度押して OFF にすると、うっかり触っても記録されません。
 
-記録できるのは MODEL・TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・
-AD>TIMBRE・AD>COLOR です（VOLUME は記録しません）。
+記録できるのは TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・
+AD>TIMBRE・AD>COLOR です（VOLUME と MODEL は記録しません）。
 
 ### 5. プリセットに保存する・呼び出す
 
@@ -221,8 +221,8 @@ Move に戻り、色も元に戻ります（Schwung の仕様で、占有でき�
 
 - REC を ON にして Move を再生し、**ノブに触れている間**、そのノブの動きが
   ループに記録されます（16 分音符 1 つにつき 8 点）。指を離すと終了。
-- 対象: MODEL・TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR。
-  VOLUME は記録しません。
+- 対象: TIMBRE・COLOR・CUTOFF・RESO・PITCH・ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR。
+  VOLUME と MODEL（音色）は記録しません（MODEL はいつでもノブで選んだ音色が鳴ります）。
 - 再生はノブの値を書き換えません（記録が優先されるだけ）。Shift + タッチで消すと
   ノブの値に戻ります。
 

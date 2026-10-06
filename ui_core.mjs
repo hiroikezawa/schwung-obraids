@@ -48,7 +48,7 @@
 import { MODEL_NAMES } from './ui_params.mjs';
 
 /* Bit k of the DSP's masks = MOTION_KEYS[k] (motion.cpp's lane order). */
-export const MOTION_KEYS = ["model", "timbre", "color", "decay", "ad_fm", "ad_timbre",
+export const MOTION_KEYS = ["timbre", "color", "decay", "ad_fm", "ad_timbre",
                             "pitch", "attack", "ad_color", "cutoff", "reso"];
 export const MAIN_KEYS = ["level", "model", "timbre", "color", "cutoff", "reso", "spare", "pitch"];
 

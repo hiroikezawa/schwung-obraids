@@ -149,13 +149,13 @@ assert read(p, "spare") == "0"
 
 # ---- RANDOM, and touch recording ----------------------------------------------
 write(p, "randomize", 1)
-assert int(read(p, "motion_status").split(",")[0]) & (1 << 6), "RANDOM fills the PITCH lane"
+assert int(read(p, "motion_status").split(",")[0]) & (1 << 5), "RANDOM fills the PITCH lane"
 write(p, "write", 1)
 write(p, "timbre", 0.9)
 for _ in range(9):                   # one whole 8-step loop, restated like the UI
     write(p, "touch", "timbre,1")
     blocks(p, 40)
-assert int(read(p, "motion_status").split(",")[2]) & (1 << 1), "TIMBRE records under the finger"
+assert int(read(p, "motion_status").split(",")[2]) & (1 << 0), "TIMBRE records under the finger"
 write(p, "touch", "timbre,0")
 write(p, "timbre", 0.1)
 blocks(p, 5)
@@ -164,6 +164,19 @@ assert read(p, "timbre") == "0.1000", "playback never writes the knob"
 write(p, "motion_clear", "timbre")
 blocks(p, 2)
 assert read(p, "eff_timbre") == "0.1000"
+
+# MODEL is never recorded: a touch on it writes nothing, and an old state's
+# MODEL lane is dropped while its other lanes are kept.
+write(p, "touch", "model,1")
+blocks(p, 40)
+assert not (int(read(p, "motion_status").split(",")[0]) & ~((1 << 10) - 1)), "no lane beyond the ten"
+write(p, "touch", "model,0")
+r = create(b".", None)
+lane = "AA" * 128
+write(r, "state", '{"v":2,"model":5,"m":"model:%s;timbre:%s","g":65535}' % (lane, lane))
+assert read(r, "motion_status").split(",")[0] == "1", read(r, "motion_status")   # timbre only
+assert '"m":"timbre:' in read(r, "state")
+destroy(r)
 
 # ---- state ---------------------------------------------------------------------
 write(p, "gate_toggle", 3)

@@ -140,6 +140,8 @@ check(touchesSent().at(-1) === "timbre,1", "touch reported: " + touchesSent());
 check(!/REC/.test(ui.title()), "no REC without the REC pad: " + ui.title());
 ui.onMidi([0x80, 2, 0]);
 check(touchesSent().at(-1) === "timbre,0", "release reported");
+ui.onMidi([0x90, 1, 127]); ui.onMidi([0x80, 1, 0]);    /* knob 2 = MODEL */
+check(!touchesSent().some((t) => t.startsWith("model")), "MODEL is never recorded");
 
 /* ---- the pads ----------------------------------------------------------- */
 check(padBlocked === true, "pads taken while the screen is up");
@@ -198,7 +200,7 @@ ui.onMidi([0x90, 7, 0]);
 check(touchesSent().at(-1) === "pitch,0", "note-on vel 0 releases");
 
 /* ---- an automated knob is drawn as modulated, from eff_<key> -------------- */
-status = `${1 << 1},3,0,16,1`;                       /* lane 1 = timbre */
+status = `${1 << 0},3,0,16,1`;                       /* lane 0 = timbre */
 reads.length = 0;
 ticks(STATUS_EVERY_TICKS * 30);
 check(c.isModulatedCached("timbre"), "automated knob marked modulated");
