@@ -26,9 +26,12 @@
  *   top-right (99)       REC: touches record motion. Solid red on, dim off.
  *   next to it (98)      RANDOM: a new Phrase Gen phrase into PITCH's steps.
  *   next to that (97)    MODELS: the list of models the MODEL knob offers.
+ *   second row (84-91)   eight PRESETS: tap recalls, Shift+tap saves the
+ *                        whole state (sound, motion, steps, scale). Off =
+ *                        empty, dim = saved, white = last recalled/saved.
+ *                        Stored in PRESET_PATH, shared by every slot.
  *   bottom two rows      the 16 trigger steps (68-75 = 1-8, 76-83 = 9-16;
  *   (68-83)              dark past an 8-step loop). The step playing is white.
- * Same layout and colours as MANIAC / LXRDRUM / BAKIBAKI.
  *
  * PITCH is an INTEGER index into the notes of the Scale page's root + scale:
  * the knob itself is set in the scale, nothing is quantized afterwards.
@@ -58,9 +61,11 @@ export const HEARTBEAT_MS = 150;         /* the DSP lets a touch go after 500 ms
 
 export const PAD_FIRST = 68, PAD_LAST = 99;
 export const GATE_LAST = 83, MODELS_PAD = 97, RANDOM_PAD = 98, RECORD_PAD = 99;
+export const PRESET_FIRST = 84, PRESETS = 8;
 /* Move pad palette indices, as MANIAC / LXRDRUM / BAKIBAKI use them. */
 export const LED = { RECORD_ON: 127, RECORD_OFF: 65, RANDOM: 21, MODELS: 118, MODELS_OPEN: 120,
-                     PRESSED: 120, PLAYHEAD: 120, GATE_ON: 11, GATE_OFF: 1, OFF: 0 };
+                     PRESSED: 120, PLAYHEAD: 120, GATE_ON: 11, GATE_OFF: 1, OFF: 0,
+                     PRESET_SAVED: 73, PRESET_CURRENT: 120 };
 const LEDS_PER_TICK = 8;                 /* 32 pads repainted every 4 frames */
 
 /* ---- the MODELS list ------------------------------------------------------ */
@@ -68,6 +73,26 @@ const LEDS_PER_TICK = 8;                 /* 32 pads repainted every 4 frames */
 export const SETTINGS_DIR = "/data/UserData/schwung/obraids";
 export const SETTINGS_PATH = `${SETTINGS_DIR}/settings.json`;
 export const MODEL_COUNT = MODEL_NAMES.length;
+
+/* ---- the preset pads ---------------------------------------------------- */
+
+export const PRESET_PATH = `${SETTINGS_DIR}/presets.json`;
+
+/* {"v":1,"presets":[8 x state string | null]}. Anything unreadable starts
+ * empty rather than refusing to run. */
+export function parsePresets(text) {
+    const out = new Array(PRESETS).fill(null);
+    if (typeof text !== "string" || !text) return out;
+    let doc;
+    try { doc = JSON.parse(text); } catch (e) { return out; }
+    const a = doc && doc.v === 1 && Array.isArray(doc.presets) ? doc.presets : [];
+    for (let i = 0; i < PRESETS; i++) out[i] = typeof a[i] === "string" && a[i] ? a[i] : null;
+    return out;
+}
+
+export function serializePresets(list) {
+    return JSON.stringify({ v: 1, presets: list });
+}
 
 /* {"v":1,"disabled":["TOY","QPSK"]} -- by NAME. Anything unreadable, and any
  * file that would leave nothing enabled, means "all enabled". */
@@ -142,6 +167,8 @@ export function createUi(deps) {
         /* MODELS list overlay */
         listOpen: false, cursor: 0, listTop: 0,
         notice: "", noticeUntil: 0,
+        presets: null,    /* loaded on first use */
+        preset: -1,       /* last recalled / saved */
     };
 
     const bare = (fullKey) => {
@@ -297,6 +324,7 @@ export function createUi(deps) {
 
     function init() {
         loadSettings();
+        loadPresets();
         readModel();
         st.vis = visibleModels(st.enabled, st.model);
         st.visDirty = false;
@@ -320,8 +348,10 @@ export function createUi(deps) {
         return m;
     }
 
-    /* The header: the model playing, then the step; PITCH's note while held. */
+    /* The header: the model playing, then the step; PITCH's note while held.
+     * A preset pad's message takes it for a moment. */
     function title() {
+        if (now() < st.noticeUntil) return st.notice;
         let head = MODEL_NAMES[st.model] || "oBraids";
         const held = heldMask();
         if (held & bit("pitch")) {
@@ -340,6 +370,11 @@ export function createUi(deps) {
             if (step >= Math.min(st.len, 16)) return LED.OFF;
             if (st.step >= 0 && step === st.step % 16) return LED.PLAYHEAD;
             return st.gates[step] === "1" ? LED.GATE_ON : LED.GATE_OFF;
+        }
+        if (note >= PRESET_FIRST && note < PRESET_FIRST + PRESETS) {
+            const i = note - PRESET_FIRST;
+            if (st.heldPads.has(note) || st.preset === i) return st.presets && st.presets[i] ? LED.PRESET_CURRENT : LED.OFF;
+            return st.presets && st.presets[i] ? LED.PRESET_SAVED : LED.OFF;
         }
         if (note === RECORD_PAD) return st.write ? LED.RECORD_ON : LED.RECORD_OFF;
         if (note === RANDOM_PAD) return st.heldPads.has(note) ? LED.PRESSED : LED.RANDOM;
@@ -499,6 +534,42 @@ export function createUi(deps) {
         st.lastBeat = now();
     }
 
+    function loadPresets() {
+        if (!st.presets) st.presets = parsePresets(readFile(PRESET_PATH));
+    }
+
+    /* Shift+tap stores the whole state; a tap applies it, playing or not. */
+    function onPreset(i) {
+        loadPresets();
+        if (shiftNow()) {
+            const text = getParam("state");
+            if (typeof text !== "string" || !text) { showNotice("SAVE FAILED"); return; }
+            const next = st.presets.slice();
+            next[i] = text;
+            if (!st.dirReady) st.dirReady = !!ensureDir(SETTINGS_DIR);
+            if (st.dirReady && writeFile(PRESET_PATH, serializePresets(next))) {
+                st.presets = next;
+                st.preset = i;
+                showNotice(`SAVED PRESET ${i + 1}`);
+                announce(`Preset ${i + 1} saved`);
+            } else {
+                showNotice("SAVE FAILED");
+            }
+            return;
+        }
+        const text = st.presets[i];
+        if (!text) { showNotice(`EMPTY ${i + 1} (SHIFT+PAD SAVES)`); return; }
+        if (!setParam("state", text)) { showNotice("LOAD FAILED"); return; }
+        st.preset = i;
+        showNotice(`PRESET ${i + 1}`);
+        announce(`Preset ${i + 1}`);
+        /* Every knob, the scale and the model list may have changed under us. */
+        readModel();
+        st.keyDirty = true;
+        pollStatus();
+        if (st.controller && typeof st.controller.revalue === "function") st.controller.revalue();
+    }
+
     function onPad(note, down) {
         if (!down) { st.heldPads.delete(note); sendLed(note, padColor(note)); return; }
         if (st.heldPads.has(note)) return;
@@ -511,6 +582,8 @@ export function createUi(deps) {
             setParam("randomize", 1);
             announce("New phrase");
             pollStatus();
+        } else if (note >= PRESET_FIRST && note < PRESET_FIRST + PRESETS) {
+            onPreset(note - PRESET_FIRST);
         } else if (note === MODELS_PAD) {
             if (st.listOpen) closeList(); else openList();
         } else if (note <= GATE_LAST) {

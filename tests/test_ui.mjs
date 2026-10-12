@@ -18,6 +18,7 @@ const shared = process.env.OB_SHARED || path.join(root, "src/shared");
 const { createController } = await load(path.join(shared, "param_pages/page_controller.mjs"));
 const { decodeInput, applyInput } = await load(path.join(shared, "param_pages/page_input.mjs"));
 const { createFramebuffer, drawContext } = await load(path.join(root, "tools/param-pages/harness.mjs"));
+const { PRESET_PATH, PRESET_FIRST, parsePresets } = await load(path.join(here, "../ui_core.mjs"));
 const { createUi, MAIN_KEYS, STATUS_EVERY_TICKS, HEARTBEAT_MS, LED, SETTINGS_PATH,
         parseModelSettings, serializeModelSettings, visibleModels, MODEL_COUNT } =
     await load(path.join(here, "../ui_core.mjs"));
@@ -60,6 +61,7 @@ const store = {
         if (key === "motion_status") return status;
         if (key === "pitch_names") return pitchNames;
         if (key === "gate_status") return gates.map((g) => g ? "1" : "0").join("");
+        if (key === "state") return JSON.stringify({ v: 2, model: Number(values.model) });
         if (key.startsWith("eff_")) return values[key.slice(4)] ?? null;
         if (key in values) return values[key];
         return "";
@@ -67,6 +69,7 @@ const store = {
     set(key, value) {
         writes.push([key, String(value)]);
         if (key === "gate_toggle") gates[Number(value)] = !gates[Number(value)];
+        if (key === "state") values.model = String(JSON.parse(value).model);
         if (key in values) values[key] = String(value);
         return true;
     },
@@ -185,7 +188,7 @@ check(ui.state.gates[1] === "0", "the poll agrees: " + ui.state.gates);
 ui.onMidi([0x90, 80, 100]); ui.onMidi([0x80, 80, 0]);   /* step 13 in an 8-step loop */
 check(!(writes.at(-1)[0] === "gate_toggle" && writes.at(-1)[1] === "12"), "a dark step pad does nothing");
 const w0 = writes.length;
-ui.onMidi([0x90, 90, 100]); ui.onMidi([0x80, 90, 0]);   /* an unassigned pad */
+ui.onMidi([0x90, 92, 100]); ui.onMidi([0x80, 92, 0]);   /* an unassigned pad (top row, left) */
 check(writes.length === w0, "unassigned pads do nothing");
 status = "0,12,0,16,1";
 ticks(STATUS_EVERY_TICKS + 8);
@@ -281,6 +284,26 @@ const modelWrites = writes.filter(([k]) => k === "model").slice(mw).map(([, v]) 
 check(modelWrites.length > 0 && modelWrites.every((v) => v === "3" || v === "32"),
       "MODEL only ever writes enabled models: " + modelWrites);
 check(values.model === "32", "and stops at the last one: " + values.model);
+
+/* ---- the preset pads (second row, 84-91) ------------------------------------ */
+ticks(8);
+check(leds[84] === LED.OFF && leds[91] === LED.OFF, "empty presets are dark");
+ui.onMidi([0x90, 86, 100]); ui.onMidi([0x80, 86, 0]);  /* tap an empty one */
+check(!writes.some(([k]) => k === "state"), "an empty preset loads nothing");
+check(/EMPTY 3/.test(ui.title()), "and says so: " + ui.title());
+values.model = "32";
+hwShift = true; ticks(1);
+ui.onMidi([0x90, 86, 100]); ui.onMidi([0x80, 86, 0]);  /* Shift+tap saves */
+hwShift = false; ticks(1);
+const savedList = parsePresets(files.get(PRESET_PATH));
+check(savedList[2] && JSON.parse(savedList[2]).model === 32, "Shift+pad stores the state: " + files.get(PRESET_PATH));
+check(/SAVED PRESET 3/.test(ui.title()), "save confirmed: " + ui.title());
+ticks(8);
+check(leds[86] === LED.PRESET_CURRENT && leds[84] === LED.OFF, "saved preset lit white");
+values.model = "3";
+ui.onMidi([0x90, 86, 100]); ui.onMidi([0x80, 86, 0]);  /* tap recalls */
+check(writes.at(-1)[0] === "state" && values.model === "32", "tap recalls the state: " + writes.at(-1));
+check(PRESET_FIRST === 84, "presets on the second row");
 
 /* ---- the screen closes: pads, colours and touches go back ---------------- */
 ui.onMidi([0x90, 2, 127]);                           /* hold TIMBRE */
