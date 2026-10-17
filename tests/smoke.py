@@ -96,7 +96,7 @@ out = c.create_string_buffer(64)
 assert get_param(p, b"ui_hierarchy", out, 64) == 0 and out.value == b"", "ui_hierarchy must be served empty"
 h = json.loads(read(p, "grid_hierarchy"))
 (pathlib.Path(LIB).parent / "grid_hierarchy.json").write_text(read(p, "grid_hierarchy"))   # for test_ui.mjs
-assert h["levels"]["root"]["knobs"] == ["level", "model", "timbre", "color", "cutoff", "reso", "spare", "pitch"]
+assert h["levels"]["root"]["knobs"] == ["level", "timbre", "color", "cutoff", "reso", "spare", "model", "pitch"]
 assert read(p, "no_such_key") is None
 for prm in params:
     got = read(p, prm["key"])

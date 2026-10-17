@@ -104,7 +104,7 @@ ui.init();
 ticks(40);
 const c = ui.state.controller;
 check(JSON.stringify(c.page.keys.map(bare)) === JSON.stringify(MAIN_KEYS),
-      "page 1 = VOLUME MODEL TIMBRE COLOR CUTOFF RESO - PITCH: " + c.page.keys);
+      "page 1 = VOLUME TIMBRE COLOR CUTOFF RESO - MODEL PITCH: " + c.page.keys);
 check(c.pages.length >= 4, `Main / AD / Braids / Scale: ${c.pages.length} pages`);
 check(!reads.includes("ui_hierarchy"), "the grid must read grid_hierarchy, never the empty ui_hierarchy");
 check(fb.countLit() > 200, "page 1 draws");
@@ -114,36 +114,36 @@ check(ui.title() === "CSAW", "title = the model: " + ui.title());
 /* ---- PITCH is a note of the scale: the DSP's names, by index ------------- */
 check(ui.state.names && ui.state.names.length === 36 && ui.state.names[14] === "C3", "names from the DSP");
 
-/* ---- MODEL: knob 2 steps over the models switched on ------------------------ */
+/* ---- MODEL: knob 7 steps over the models switched on ------------------------ */
 check(ui.state.vis.length === MODEL_COUNT, "all 47 models offered by default");
-/* knob 2: a few detents (newer page engines step a stepped knob every few) */
-for (let i = 0; i < 6; i++) { ui.onMidi([0xb0, 72, 1]); ticks(2); }
+/* knob 7: a few detents (newer page engines step a stepped knob every few) */
+for (let i = 0; i < 6; i++) { ui.onMidi([0xb0, 77, 1]); ticks(2); }
 ticks(10);
 check(writes.some(([k, v]) => k === "model" && v === "1"), "MODEL +1 writes the real index 1: " + writes.filter(([k]) => k === "model"));
 
-/* ---- knob 7 is a spare: it writes nothing; knobs 5/6 are the low-pass ------ */
+/* ---- knob 6 is a spare: it writes nothing; knobs 4/5 are the low-pass ------ */
 const wSpare = writes.length;
-for (let i = 0; i < 12; i++) ui.onMidi([0xb0, 77, 1]);  /* knob 7 */
-ui.onMidi([0x90, 6, 127]); ui.onMidi([0x80, 6, 0]);    /* and its touch */
+for (let i = 0; i < 12; i++) ui.onMidi([0xb0, 76, 1]);  /* knob 6 */
+ui.onMidi([0x90, 5, 127]); ui.onMidi([0x80, 5, 0]);    /* and its touch */
 ticks(10);
 check(writes.length === wSpare, "the spare knob writes nothing: " + writes.slice(wSpare));
-ui.onMidi([0xb0, 75, 127]);                            /* knob 5 down */
+ui.onMidi([0xb0, 74, 127]);                            /* knob 4 down */
 ticks(10);
-check(writes.some(([k, v]) => k === "cutoff" && Number(v) < 1), "knob 5 = CUTOFF: " + writes.slice(wSpare));
-ui.onMidi([0xb0, 76, 1]);                              /* knob 6 up */
+check(writes.some(([k, v]) => k === "cutoff" && Number(v) < 1), "knob 4 = CUTOFF: " + writes.slice(wSpare));
+ui.onMidi([0xb0, 75, 1]);                              /* knob 5 up */
 ticks(10);
-check(writes.some(([k, v]) => k === "reso" && Number(v) > 0), "knob 6 = RESO");
+check(writes.some(([k, v]) => k === "reso" && Number(v) > 0), "knob 5 = RESO");
 
 /* ---- playing: step in the header; no REC until the REC pad ---------------- */
 status = "0,4,0,8,0";
 ticks(STATUS_EVERY_TICKS);
 check(/ 5\/8$/.test(ui.title()), "step in header: " + ui.title());
-ui.onMidi([0x90, 2, 127]);                            /* knob 3 touch = TIMBRE */
+ui.onMidi([0x90, 1, 127]);                            /* knob 2 touch = TIMBRE */
 check(touchesSent().at(-1) === "timbre,1", "touch reported: " + touchesSent());
 check(!/REC/.test(ui.title()), "no REC without the REC pad: " + ui.title());
-ui.onMidi([0x80, 2, 0]);
+ui.onMidi([0x80, 1, 0]);
 check(touchesSent().at(-1) === "timbre,0", "release reported");
-ui.onMidi([0x90, 1, 127]); ui.onMidi([0x80, 1, 0]);    /* knob 2 = MODEL */
+ui.onMidi([0x90, 6, 127]); ui.onMidi([0x80, 6, 0]);    /* knob 7 = MODEL */
 check(!touchesSent().some((t) => t.startsWith("model")), "MODEL is never recorded");
 
 /* ---- the pads ----------------------------------------------------------- */
@@ -163,13 +163,13 @@ ui.onMidi([0x80, 99, 0]);
 status = "0,4,0,8,1";
 ticks(STATUS_EVERY_TICKS);
 check(/ ARM 5\/8$/.test(ui.title()), "armed: " + ui.title());
-ui.onMidi([0x90, 2, 127]);
+ui.onMidi([0x90, 1, 127]);
 check(/ REC 5\/8$/.test(ui.title()), "REC under the finger at once: " + ui.title());
 const n0 = touchesSent().filter((t) => t === "timbre,1").length;
 ticks(Math.ceil(HEARTBEAT_MS * 4 / 17));
 const beats = touchesSent().filter((t) => t === "timbre,1").length - n0;
 check(beats >= 3 && beats <= 5, `heartbeat restates the touch (${beats} in ${HEARTBEAT_MS * 4} ms)`);
-ui.onMidi([0x80, 2, 0]);
+ui.onMidi([0x80, 1, 0]);
 const quiet = touchesSent().length;
 ticks(40);
 check(touchesSent().length === quiet, "no heartbeat once released");
@@ -212,9 +212,9 @@ check(reads.includes("eff_timbre"), "its playing value is read as eff_timbre");
 /* ---- Shift + touch clears one lane; on VOLUME, all ------------------------ */
 const before = touchesSent().length;
 hwShift = true;
-ui.onMidi([0x90, 2, 127]);
+ui.onMidi([0x90, 1, 127]);
 check(writes.at(-1)[0] === "motion_clear" && writes.at(-1)[1] === "timbre", "shift+touch clears the lane: " + writes.at(-1));
-ui.onMidi([0x80, 2, 0]);
+ui.onMidi([0x80, 1, 0]);
 ui.onMidi([0x90, 0, 127]);
 check(writes.at(-1)[0] === "motion_clear" && writes.at(-1)[1] === "all", "shift+touch VOLUME clears all");
 ui.onMidi([0x80, 0, 0]);
@@ -278,7 +278,7 @@ check(ui.handleBack() === true, "Back closes the list (consumed)");
 ticks(STATUS_EVERY_TICKS * 2);
 check(JSON.stringify(ui.state.vis) === "[3,32]", "the knob offers FOLD and BELL: " + ui.state.vis);
 const mw = writes.filter(([k]) => k === "model").length;
-for (let i = 0; i < 30; i++) ui.onMidi([0xb0, 72, 1]);     /* spin MODEL up */
+for (let i = 0; i < 30; i++) ui.onMidi([0xb0, 77, 1]);     /* spin MODEL up */
 ticks(10);
 const modelWrites = writes.filter(([k]) => k === "model").slice(mw).map(([, v]) => v);
 check(modelWrites.length > 0 && modelWrites.every((v) => v === "3" || v === "32"),
@@ -306,7 +306,7 @@ check(writes.at(-1)[0] === "state" && values.model === "32", "tap recalls the st
 check(PRESET_FIRST === 84, "presets on the second row");
 
 /* ---- the screen closes: pads, colours and touches go back ---------------- */
-ui.onMidi([0x90, 2, 127]);                           /* hold TIMBRE */
+ui.onMidi([0x90, 1, 127]);                           /* hold TIMBRE */
 shown = false;
 ticks(1);
 check(padBlocked === false, "pads handed back");

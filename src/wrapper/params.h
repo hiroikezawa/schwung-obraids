@@ -20,13 +20,13 @@ struct ParamInfo {
 };
 
 // In the knob grid's page order (module.json's chain_params must match):
-//   main    LEVEL MODEL TIMBRE COLOR CUTOFF RESO (spare) PITCH
+//   main    LEVEL TIMBRE COLOR CUTOFF RESO (spare) MODEL PITCH
 //   AD      ATTACK DECAY AD>FM AD>TIMBRE AD>COLOR AD>VCA COARSE FINE
 //   Braids  BITS RATE DRIFT FLAT SIGN NOTE-OFF
 //   Scale   ROOT SCALE STEPS
 // Braids' own settings are in the hardware's own units (DECAY 5 = 5).
 enum ParamId {
-  P_LEVEL, P_MODEL, P_TIMBRE, P_COLOR, P_CUTOFF, P_RESO, P_SPARE, P_PITCH,
+  P_LEVEL, P_TIMBRE, P_COLOR, P_CUTOFF, P_RESO, P_SPARE, P_MODEL, P_PITCH,
   P_ATTACK, P_DECAY, P_AD_FM, P_AD_TIMBRE, P_AD_COLOR, P_AD_VCA, P_COARSE, P_FINE,
   P_BITS, P_RATE, P_DRIFT, P_FLAT, P_SIGN, P_NOTEOFF,
   P_ROOT, P_SCALE, P_STEPS,

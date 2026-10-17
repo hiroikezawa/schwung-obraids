@@ -12,6 +12,62 @@ export const PARAMS = [
   "unit": "%"
  },
  {
+  "key": "timbre",
+  "name": "Timbre",
+  "short_name": "TIMBRE",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0.5,
+  "unit": "%"
+ },
+ {
+  "key": "color",
+  "name": "Color",
+  "short_name": "COLOR",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0.5,
+  "unit": "%"
+ },
+ {
+  "key": "cutoff",
+  "name": "Cutoff",
+  "short_name": "CUTOFF",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 1,
+  "viz": false
+ },
+ {
+  "key": "reso",
+  "name": "Resonance",
+  "short_name": "RESO",
+  "type": "float",
+  "min": 0,
+  "max": 1,
+  "step": 0.01,
+  "default": 0,
+  "unit": "%",
+  "viz": false
+ },
+ {
+  "key": "spare",
+  "name": "-",
+  "short_name": "-",
+  "type": "enum",
+  "options": [
+   "-"
+  ],
+  "default": "-",
+  "access": "read"
+ },
+ {
   "key": "model",
   "name": "Model",
   "short_name": "MODEL",
@@ -66,60 +122,6 @@ export const PARAMS = [
    "QPSK"
   ],
   "default": "CSAW"
- },
- {
-  "key": "timbre",
-  "name": "Timbre",
-  "short_name": "TIMBRE",
-  "type": "float",
-  "min": 0,
-  "max": 1,
-  "step": 0.01,
-  "default": 0.5,
-  "unit": "%"
- },
- {
-  "key": "color",
-  "name": "Color",
-  "short_name": "COLOR",
-  "type": "float",
-  "min": 0,
-  "max": 1,
-  "step": 0.01,
-  "default": 0.5,
-  "unit": "%"
- },
- {
-  "key": "cutoff",
-  "name": "Cutoff",
-  "short_name": "CUTOFF",
-  "type": "float",
-  "min": 0,
-  "max": 1,
-  "step": 0.01,
-  "default": 1
- },
- {
-  "key": "reso",
-  "name": "Resonance",
-  "short_name": "RESO",
-  "type": "float",
-  "min": 0,
-  "max": 1,
-  "step": 0.01,
-  "default": 0,
-  "unit": "%"
- },
- {
-  "key": "spare",
-  "name": "-",
-  "short_name": "-",
-  "type": "enum",
-  "options": [
-   "-"
-  ],
-  "default": "-",
-  "access": "read"
  },
  {
   "key": "pitch",

@@ -89,13 +89,13 @@ Synth に **oBraids** を選びます。
 
 | ノブ | | |
 |---|---|---|
-| 1 VOLUME | 2 MODEL（47 種の音色） | 3 TIMBRE | 4 COLOR |
-| 5 CUTOFF | 6 RESO | 7（ダミー） | 8 PITCH |
+| 1 VOLUME | 2 TIMBRE | 3 COLOR | 4 CUTOFF |
+| 5 RESO | 6（ダミー） | 7 MODEL（47 種の音色） | 8 PITCH |
 
 - **MODEL** で音色の種類、**TIMBRE / COLOR** で音色の変化を選びます（Braids の 2 つのポット）。
 - **CUTOFF / RESO** はローパスフィルター。CUTOFF を下げるとこもった音に、RESO で癖が付きます。
 - **PITCH** はスケール上の音を選びます（スケールは Scale ページで設定）。
-- ノブ 7 は何もしません（触っても安全）。
+- ノブ 6 は何もしません（触っても安全）。
 - **よく使う音色だけに絞る**: 47 種を全部回すのは大変なので、MODELS パッド（RANDOM の
   左隣）で一覧を開き、使う音色だけを ON にできます。すると MODEL ノブは ON の音色だけを
   選ぶようになります。設定は自動で保存され、すべてのスロットの oBraids で共通です
@@ -189,16 +189,17 @@ AD>TIMBRE・AD>COLOR です（VOLUME と MODEL は記録しません）。
 
 | ページ | ノブ 1–8 |
 |---|---|
-| メイン | VOLUME・MODEL・TIMBRE・COLOR・CUTOFF・RESO・（ダミー）・PITCH |
+| メイン | VOLUME・TIMBRE・COLOR・CUTOFF・RESO・（ダミー）・MODEL・PITCH |
 | AD | ATTACK・DECAY・AD>FM・AD>TIMBRE・AD>COLOR・AD>VCA・COARSE・FINE |
 | Braids | BITS・RATE・DRIFT・FLAT・SIGN・NOTE OFF |
 | Scale | ROOT・SCALE・STEPS |
 | My Presets | プリセットの呼び出し・保存・削除（Schwung 共通） |
 | Module | モジュールの入れ替え・ヘルプ（Schwung 共通） |
 
-ノブ 5・6 は**ローパスフィルター**（CUTOFF / RESO）です。ノブ 7 は**何もしないダミー**
-（点線の枠に `-`）で、回しても触っても何も起きません。Schwung 標準グリッドは空きの
-ノブ枠を作れない（詰めて並べる）ので、PITCH をノブ 8 に置くための埋め草です。
+ノブ 4・5 は**ローパスフィルター**（CUTOFF / RESO）、ノブ 7 が**音色の選択（MODEL）**です。
+ノブ 6 は**何もしないダミー**（点線の枠に `-`）で、回しても触っても何も起きません。
+Schwung 標準グリッドは空きのノブ枠を作れない（詰めて並べる）ので、MODEL をノブ 7、
+PITCH をノブ 8 に置くための埋め草です。
 DECAY / AD>FM / AD>TIMBRE は、うっかり触らないよう AD ページに移しました（v0.4.0）。
 
 ヘッダーには現在のモデル名、ループの位置、REC ON 中は `ARM`、記録中は `REC` が出ます。
@@ -340,12 +341,12 @@ MIDI ファイルのどこが使われるか:
 | ページ | ノブ | 名前 | 範囲 | 実機との対応 |
 |---|---|---|---|---|
 | メイン | 1 | VOLUME | 0–100（既定 50） | 出力レベル |
-| メイン | 2 | MODEL（音色） | 47 モデル | WAVE メニュー（CSAW … QPSK、下表） |
-| メイン | 3 | TIMBRE | 0–100 | TIMBRE ポット（0–32767） |
-| メイン | 4 | COLOR | 0–100 | COLOR ポット（0–32767） |
-| メイン | 5 | CUTOFF | 20 Hz–20 kHz（既定 20 kHz = 全開） | ローパスフィルター（実機にはない） |
-| メイン | 6 | RESO | 0–100（既定 0） | フィルターのレゾナンス（Q 0.7〜10） |
-| メイン | 7 | （ダミー） | – | 何もしない |
+| メイン | 2 | TIMBRE | 0–100 | TIMBRE ポット（0–32767） |
+| メイン | 3 | COLOR | 0–100 | COLOR ポット（0–32767） |
+| メイン | 4 | CUTOFF | 20 Hz–20 kHz（既定 20 kHz = 全開） | ローパスフィルター（実機にはない） |
+| メイン | 5 | RESO | 0–100（既定 0） | フィルターのレゾナンス（Q 0.7〜10） |
+| メイン | 6 | （ダミー） | – | 何もしない |
+| メイン | 7 | MODEL（音色） | 47 モデル | WAVE メニュー（CSAW … QPSK、下表） |
 | メイン | 8 | PITCH | スケールの音、C1–C6（既定 C3） | 発音する音程 |
 | AD | 1 | ATTACK | 0–15 | `\ATT` |
 | AD | 2 | DECAY | 0–15（既定 5） | `\DEC` |

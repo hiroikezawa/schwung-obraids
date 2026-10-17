@@ -8,7 +8,7 @@
  * drives Schwung's OWN page engine (page_controller.mjs) itself: the same
  * grid, the same pages, plus the knobs' touch sensors and the pads.
  *
- * Pages: main   VOLUME MODEL TIMBRE COLOR CUTOFF RESO - PITCH  (7 is a
+ * Pages: main   VOLUME TIMBRE COLOR CUTOFF RESO - MODEL PITCH  (6 is a
  *               read-only spare: the grid cannot leave a knob slot empty)
  *        AD     ATTACK DECAY AD>FM AD>TIMBRE AD>COLOR AD>VCA COARSE FINE
  *        Braids BITS RATE DRIFT FLAT SIGN NOTE-OFF
@@ -53,7 +53,7 @@ import { MODEL_NAMES } from './ui_params.mjs';
 /* Bit k of the DSP's masks = MOTION_KEYS[k] (motion.cpp's lane order). */
 export const MOTION_KEYS = ["timbre", "color", "decay", "ad_fm", "ad_timbre",
                             "pitch", "attack", "ad_color", "cutoff", "reso"];
-export const MAIN_KEYS = ["level", "model", "timbre", "color", "cutoff", "reso", "spare", "pitch"];
+export const MAIN_KEYS = ["level", "timbre", "color", "cutoff", "reso", "spare", "model", "pitch"];
 
 export const STATUS_EVERY_TICKS = 6;     /* ~10 Hz: one IPC read costs ~2.8 ms */
 export const NAMES_EVERY_TICKS = 120;

@@ -60,8 +60,8 @@ const int kSilenceLsb = 4;
 const char kHierarchy[] =
     "{\"modes\":null,\"levels\":{"
       "\"root\":{\"label\":\"oBraids\","
-        "\"knobs\":[\"level\",\"model\",\"timbre\",\"color\",\"cutoff\",\"reso\",\"spare\",\"pitch\"],"
-        "\"params\":[\"level\",\"model\",\"timbre\",\"color\",\"cutoff\",\"reso\",\"spare\",\"pitch\","
+        "\"knobs\":[\"level\",\"timbre\",\"color\",\"cutoff\",\"reso\",\"spare\",\"model\",\"pitch\"],"
+        "\"params\":[\"level\",\"timbre\",\"color\",\"cutoff\",\"reso\",\"spare\",\"model\",\"pitch\","
           "{\"level\":\"ad\",\"label\":\"AD\"},{\"level\":\"braids\",\"label\":\"Braids\"},"
           "{\"level\":\"scale\",\"label\":\"Scale\"}]},"
       "\"ad\":{\"label\":\"AD\","

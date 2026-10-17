@@ -19,12 +19,12 @@ namespace obraids {
 // FORMAT IS PARSED by scripts/metadata.py: one row per line, in this order.
 const ParamInfo kParams[P_COUNT] = {
   {"level",     PT_FLOAT,   0.0f,    1.0f,  0.5f},
-  {"model",     PT_ENUM,    0.0f,   46.0f,  0.0f},
   {"timbre",    PT_FLOAT,   0.0f,    1.0f,  0.5f},
   {"color",     PT_FLOAT,   0.0f,    1.0f,  0.5f},
   {"cutoff",    PT_FLOAT,   0.0f,    1.0f,  1.0f},
   {"reso",      PT_FLOAT,   0.0f,    1.0f,  0.0f},
   {"spare",     PT_ENUM,    0.0f,    0.0f,  0.0f},
+  {"model",     PT_ENUM,    0.0f,   46.0f,  0.0f},
   {"pitch",     PT_INT,     0.0f,   60.0f, 14.0f},
   {"attack",    PT_INT,     0.0f,   15.0f,  0.0f},
   {"decay",     PT_INT,     0.0f,   15.0f,  5.0f},
