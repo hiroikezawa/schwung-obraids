@@ -1,0 +1,149 @@
+{
+  "title": "oBraids",
+  "children": [
+    {
+      "title": "Idea",
+      "lines": [
+        "The Braids macro",
+        "oscillator, played",
+        "from MIDI and an",
+        "auto 1/16 sequence.",
+        "The DSP is the",
+        "original open-source",
+        "Braids code, run at",
+        "96 kHz."
+      ]
+    },
+    {
+      "title": "Playing",
+      "lines": [
+        "Press Play on Move:",
+        "a note on every 1/16",
+        "whose step pad is on,",
+        "at PITCH.",
+        "Stopped = silent.",
+        "MIDI notes from a",
+        "Move track play too,",
+        "at their own pitch."
+      ]
+    },
+    {
+      "title": "Main page",
+      "lines": [
+        "1 VOLUME",
+        "2 TIMBRE",
+        "3 COLOR",
+        "4 CUTOFF low-pass",
+        "5 RESO",
+        "6 (spare, no effect)",
+        "7 MODEL 47 sounds",
+        "8 PITCH note of the",
+        "        scale"
+      ]
+    },
+    {
+      "title": "AD page",
+      "lines": [
+        "1 ATTACK",
+        "2 DECAY note length",
+        "3 AD>FM",
+        "4 AD>TIMBRE",
+        "5 AD>COLOR",
+        "6 AD>VCA env sets",
+        "  the volume",
+        "7 COARSE semitones",
+        "8 FINE   cents"
+      ]
+    },
+    {
+      "title": "Braids page",
+      "lines": [
+        "1 BITS  bit depth",
+        "2 RATE  sample rate",
+        "3 DRIFT VCO drift",
+        "4 FLAT  VCO flatten",
+        "5 SIGN  signature",
+        "6 N.OFF note-off:",
+        "  AUTO, DRONE, GATE"
+      ]
+    },
+    {
+      "title": "Pads",
+      "lines": [
+        "While this screen is",
+        "up the pads are",
+        "oBraids's:",
+        "Top right: REC,",
+        "  RANDOM, MODELS.",
+        "Row 2: presets 1-8.",
+        "Bottom 2 rows: the",
+        "  16 steps on/off.",
+        "  White = playing."
+      ]
+    },
+    {
+      "title": "REC motion",
+      "lines": [
+        "REC on + Move",
+        "playing: touch a",
+        "knob and turn it to",
+        "record its move.",
+        "Shift+touch: clear",
+        "that knob.",
+        "Shift+touch VOLUME:",
+        "clear all.",
+        "Recorded: TIMBRE,",
+        "COLOR, CUTOFF, RESO,",
+        "PITCH, ATTACK, DECAY,",
+        "AD>FM, AD>TIMBRE,",
+        "AD>COLOR."
+      ]
+    },
+    {
+      "title": "RANDOM",
+      "lines": [
+        "Writes a new melody",
+        "into PITCH, one note",
+        "per step, all in",
+        "ROOT + SCALE, around",
+        "the PITCH knob's",
+        "note. Press again",
+        "for another.",
+        "Shift+touch PITCH",
+        "clears it."
+      ]
+    },
+    {
+      "title": "Presets",
+      "lines": [
+        "Row 2 pads:",
+        "tap = recall,",
+        "Shift+tap = save.",
+        "Saves knobs, motion,",
+        "steps and scale.",
+        "Dark = empty,",
+        "dim = saved,",
+        "white = current."
+      ]
+    },
+    {
+      "title": "MODELS list",
+      "lines": [
+        "Pad MODELS opens it.",
+        "Jog: move, click:",
+        "on/off. The MODEL",
+        "knob offers only the",
+        "models that are on.",
+        "Back closes."
+      ]
+    },
+    {
+      "title": "Scale page",
+      "lines": [
+        "1 ROOT  of PITCH",
+        "2 SCALE of PITCH",
+        "3 STEPS loop 8/16"
+      ]
+    }
+  ]
+}
